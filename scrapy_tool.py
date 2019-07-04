@@ -47,7 +47,7 @@ class scrapy_tool():
     def get_ip_list1(self):
         ip_list = []
         try:
-            r = requests.get('http://127.0.0.1:8000/?types=0&county=国内')
+            r = requests.get('http://localhost:8000/?types=0&county=国内')
             ip_ports = json.loads(r.text)
             for ipport in ip_ports:
                 ip_list.append('{}:{}'.format(ipport[0], ipport[1]))
