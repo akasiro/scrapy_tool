@@ -4,17 +4,16 @@ import random
 from bs4 import BeautifulSoup
 
 class scrapy_tool():
-    def __init__(self, test_url = 'http://www.baidu.com'):
+    def __init__(self, test_url = 'http://www.baidu.com', china = True):
         self.Default_headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'}
 
         with open('user_agent','r') as f:
             self.list_user_agent = f.readlines()
-
+        self.china = china
         self.test_url = test_url
         self.ip_list = list(set(self.get_ip_list1()+ self.get_ip_list2()))
-        self.proxies = None
-
+        self.proxies = {}
 
     #获取随机header
     def random_headers(self):
@@ -44,14 +43,18 @@ class scrapy_tool():
                     self.ip_list.remove(ip_temp)
             except:
                 self.ip_list.remove(ip_temp)
-                time.sleep(0.5)
+                time.sleep(0.1)
         return self.proxies
 
     #使用qiye的IProxy程序获取ip池
     def get_ip_list1(self):
+        if self.china:
+            country = '国内'
+        else:
+            country = '国外'
         ip_list = []
         try:
-            r = requests.get('http://localhost:8000/?types=0&county=国内')
+            r = requests.get('http://localhost:8000/?types=0&county={}'.format(country))
             ip_ports = json.loads(r.text)
             for ipport in ip_ports:
                 ip_list.append('{}:{}'.format(ipport[0], ipport[1]))
@@ -81,8 +84,9 @@ class scrapy_tool():
         self.ip_list = list(set(self.get_ip_list1() + self.get_ip_list2()))
     #换代理ip
     def change_proxy(self):
-        if self.proxies != None:
+        if self.proxies != {}:
             self.ip_list.remove(self.proxies['http'].replace('http://',''))
+            self.proxies = {}
         return self.random_proxy()
 
 
@@ -91,8 +95,8 @@ class scrapy_tool():
 
 
 if __name__ == '__main__':
-    url = 'http://aso.niaogebiji.com'
-    st = scrapy_tool(url)
+    url = 'https://www.boundhub.com/'
+    st = scrapy_tool(url,china= False)
     print(st.random_headers())
     print(st.random_proxy())
     print(st.change_proxy())
