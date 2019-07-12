@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import requests, time, json
+import requests, time, json,os
 import random
 from bs4 import BeautifulSoup
 
@@ -7,8 +7,8 @@ class scrapy_tool():
     def __init__(self, test_url = 'http://www.baidu.com', china = True):
         self.Default_headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'}
-
-        with open('user_agent','r') as f:
+        path = os.path.dirname(__file__)
+        with open(os.path.join(path,'user_agent'),'r') as f:
             self.list_user_agent = f.readlines()
         self.china = china
         self.test_url = test_url
