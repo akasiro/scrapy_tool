@@ -12,7 +12,10 @@ class scrapy_tool():
             self.list_user_agent = f.readlines()
         self.china = china
         self.test_url = test_url
-        self.ip_list = list(set(self.get_ip_list1()+ self.get_ip_list2()))
+        if china:
+            self.ip_list = list(set(self.get_ip_list1()+ self.get_ip_list2()))
+        else:
+            self.ip_list = self.get_ip_list1()
         self.proxies = {}
 
     #获取随机header
