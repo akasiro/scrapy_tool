@@ -2,12 +2,13 @@ import requests,json,time
 from bs4 import BeautifulSoup
 
 class proxypool():
-    def __init__(self,qiyeurl = 'http://localhost:8000', xiciurl = 'http://www.xicidaili.com/wn/',china = True):
+    def __init__(self,qiyeurl = 'http://localhost:8000', xiciurl = 'http://www.xicidaili.com/wn/',china = True, testurl = 'http://www.baidu.com'):
         '''
 
         :param qiyeurl: the url  to get qiye proxiey
         :param xiciurl: t
         :param china: boolen, used china proxy or not
+        :param testurl: 测试ip是否可用的网站
         '''
         self.Default_headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'
@@ -15,6 +16,7 @@ class proxypool():
         self.qiyeurl = qiyeurl
         self.xiciurl = xiciurl
         self.china = china
+        self.testurl = testurl
 
         self.pool = self.refreshpool(self.china)
 
@@ -80,7 +82,7 @@ class proxypool():
             if kwargs.get('url') != None:
                 testurl = kwargs.get('url')
             else:
-                testurl = 'http://www.baidu.com'
+                testurl = self.testurl
             try:
                 res = requests.get(testurl, headers=self.Default_headers, proxies=tempproxies, timeout=1)
                 if res.status_code == 200:
