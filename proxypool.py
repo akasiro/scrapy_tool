@@ -2,11 +2,15 @@ import requests,json,time
 from bs4 import BeautifulSoup
 
 class proxypool():
-    def __init__(self,qiyeurl = 'http://localhost:8000', xiciurl = 'http://www.xicidaili.com/wn/',china = True, testurl = 'http://www.baidu.com'):
+    def __init__(self,
+                 qiyeurl = 'http://localhost:8000',
+                 xiciurl = 'http://www.xicidaili.com/wn/',
+                 china = True,
+                 testurl = 'http://www.baidu.com'):
         '''
 
-        :param qiyeurl: the url  to get qiye proxiey
-        :param xiciurl: t
+        :param qiyeurl: the url  to get qiye proxies
+        :param xiciurl: the url to get xici proxies
         :param china: boolen, used china proxy or not
         :param testurl: 测试ip是否可用的网站
         '''
@@ -18,24 +22,24 @@ class proxypool():
         self.china = china
         self.testurl = testurl
 
-        self.pool = self.refreshpool(self.china)
+        self.pool = self.refreshpool()
 
 
-    def refreshpool(self,china = True):
+    def refreshpool(self):
         '''
         build a proxy pool or refresh proxy pool
         :param china: china poxies or not
         :return:
         '''
-        if china:
-            iplist = self.get_ip_list1(china)+self.get_ip_list2()
+        if self.china:
+            iplist = list(set(self.get_ip_list1()+self.get_ip_list2()))
         else:
-            iplist = self.get_ip_list1(china)
+            iplist = self.get_ip_list1()
         pool = [{'http': 'http://{}'.format(ip_temp),'https': 'https://{}'.format(ip_temp)} for ip_temp in iplist]
         return pool
     # 使用qiye的IProxy程序获取ip池
-    def get_ip_list1(self,china):
-        if china:
+    def get_ip_list1(self):
+        if self.china:
             country = '国内'
         else:
             country = '国外'
@@ -61,10 +65,10 @@ class proxypool():
             ip_list = []
         return ip_list
 
-    def pickproxy(self,**kwargs):
+    def pickproxy(self,testurl = None):
         '''
         :param
-        :param url: (optional) baseurl used to test whether the proxies is useful
+        :param testurl: (optional) baseurl used to test whether the proxies is useful
 
         :return:tempproxies, a useful proxies
         '''
@@ -73,18 +77,16 @@ class proxypool():
         while iter_time< 2:
             # 代理池里没有代理的话刷新
             if len(self.pool) == 0:
-                self.pool = self.refreshpool(self.china)
+                self.pool = self.refreshpool()
                 iter_time += 1
                 continue
             # 从代理池中提取一个代理
             tempproxies = self.pool.pop()
             # 检验代理
-            if kwargs.get('url') != None:
-                testurl = kwargs.get('url')
-            else:
+            if testurl == None:
                 testurl = self.testurl
             try:
-                res = requests.get(testurl, headers=self.Default_headers, proxies=tempproxies, timeout=1)
+                res = requests.get(testurl, headers=self.Default_headers, proxies=tempproxies)
                 if res.status_code == 200:
                     res.close()
                     break
@@ -96,6 +98,7 @@ class proxypool():
         return tempproxies
 
 if __name__ == "__main__":
-    ippool = proxypool()
+    url = 'https://www.indiegogo.com/'
+    ippool = proxypool(china=False, qiyeurl= 'http://123.206.39.146:8000',testurl=url)
     print(ippool.pickproxy())
 
