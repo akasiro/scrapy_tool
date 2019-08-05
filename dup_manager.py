@@ -1,10 +1,9 @@
-import sqlite3
-import hashlib
+import sqlite3,os,hashlib
 
 
 class dup_manager():
-    def __init__(self,name, type = 'varchar(50)',newlist = [], errortable = False, newtable = False):
-        self.conn = sqlite3.connect('duplicate_check.db')
+    def __init__(self,name, type = 'varchar(50)',newlist = [], errortable = False, newtable = False, document_path = ''):
+        self.conn = sqlite3.connect(os.path.join(document_path,'duplicate_check.db'))
         self.cur = self.conn.cursor()
         self.name = name
         # 创建3个表
@@ -111,7 +110,6 @@ class dup_manager():
         return len(temp)
 
 if __name__ == "__main__":
-
     with open('user_agent', 'r') as f:
         temp = [i.replace('\n','') for i in f.readlines()]
     dm = dup_manager('test', newtable=True, errortable=True, newlist= temp)
