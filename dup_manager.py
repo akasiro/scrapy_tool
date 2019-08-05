@@ -6,11 +6,12 @@ class dup_manager():
         self.conn = sqlite3.connect(os.path.join(document_path,'duplicate_check.db'))
         self.cur = self.conn.cursor()
         self.name = name
+        self.hash_sha256 = hashlib.sha256()
         # 创建3个表
         # 1.创建已经完成的表
         self.success = set()
         try:
-            self.cur.execute('create table {}_success (id integer primary key autoincrement, {} {}, hash varchar(100))'.format(name,name,type))
+            self.cur.execute('create table {}_success ({} {}, hash varchar(100) primary key)'.format(name,name,type))
             self.conn.commit()
         except:
             self.cur.execute('select {} from {}_success'.format(name,name))
@@ -86,9 +87,10 @@ class dup_manager():
 
     def add_success(self,successthing):
         if successthing not in self.success:
-            hash = hashlib.sha256(successthing.encode()).hexdigest()
+            self.hash_sha256.update(successthing.encode())
+            hash = self.hash_sha256.hexdigest()
             try:
-                self.cur.execute('insert into {}_success values (?,?,?)'.format(self.name), (None, successthing, hash))
+                self.cur.execute('insert into {}_success values (?,?)'.format(self.name), (successthing, hash))
                 self.conn.commit()
                 self.success.add(successthing)
             except:
@@ -115,6 +117,7 @@ if __name__ == "__main__":
     dm = dup_manager('test', newtable=True, errortable=True, newlist= temp)
     dm.add_error(temp[3])
     dm.add_success(temp[4])
+    dm.add_success(temp[5])
 
 
 

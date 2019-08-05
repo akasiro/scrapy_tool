@@ -1,4 +1,4 @@
-import os,sqlite3
+import os,sqlite3,hashlib
 class dataoutput():
     def __init__(self, method, data_path = 'data', db_name = 'data.db'):
         if not os.path.exists(data_path):
@@ -12,7 +12,6 @@ class dataoutput():
         try:
             self.cur.execute(create_tb_cmd)
             self.conn.commit()
-            print('SUCCESS: {} create'.format(tablename))
         except:
             print('ERROR: error in creating table in db')
 
@@ -41,6 +40,23 @@ class dataoutput():
                 self.conn.commit()
             except:
                 print('ERROR: insert data')
+
+
+    def save_file(self,response, filepath, filename):
+        filehash = None
+        full_filepath = os.path.join(filepath,filename)
+        if not os.path.exists(full_filepath):
+            if not os.path.exists(filepath):
+                os.makedirs(filepath)
+            with open(full_filepath,'ab+') as f:
+                f.write(response.content)
+                sha256_hash = hashlib.sha256()
+                sha256_hash.updata(f)
+                filehash = sha256_hash.hexdigest()
+        return filehash
+
+
+
 if __name__ == '__main__':
     dp = dataoutput('db', 'test')
     vardict = {'id':'integer primary key autoincrement',
