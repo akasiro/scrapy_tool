@@ -1,12 +1,12 @@
 import requests,json,time
 from bs4 import BeautifulSoup
-
+from config import *
 class proxypool():
     def __init__(self,
-                 qiyeurl = 'http://localhost:8000',
-                 xiciurl = 'http://www.xicidaili.com/wn/',
+                 qiyeurl = QIYE_URL,
+                 xiciurl = XICI_URL,
                  china = True,
-                 testurl = 'http://www.baidu.com'):
+                 testurl = TEST_URL):
         '''
 
         :param qiyeurl: the url  to get qiye proxies
@@ -14,9 +14,7 @@ class proxypool():
         :param china: boolen, used china proxy or not
         :param testurl: 测试ip是否可用的网站
         '''
-        self.Default_headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'
-        }
+
         self.qiyeurl = qiyeurl
         self.xiciurl = xiciurl
         self.china = china
@@ -53,7 +51,7 @@ class proxypool():
     #从西刺代理直接爬取获取ip池
     def get_ip_list2(self):
         try:
-            web_data = requests.get(self.xiciurl, headers=self.Default_headers)
+            web_data = requests.get(self.xiciurl, headers=DEFAULT_HEADER)
             soup = BeautifulSoup(web_data.text, 'html.parser')
             ips = soup.find_all('tr')
             ip_list = []
@@ -86,7 +84,7 @@ class proxypool():
             if testurl == None:
                 testurl = self.testurl
             try:
-                res = requests.get(testurl, headers=self.Default_headers, proxies=tempproxies)
+                res = requests.get(testurl, headers=DEFAULT_HEADER, proxies=tempproxies)
                 if res.status_code == 200:
                     res.close()
                     break

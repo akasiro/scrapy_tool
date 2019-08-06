@@ -85,10 +85,11 @@ class dup_manager():
         for i in newlist:
             self.add_new(i)
 
-    def add_success(self,successthing):
+    def add_success(self,successthing,hash = None):
         if successthing not in self.success:
-            self.hash_sha256.update(successthing.encode())
-            hash = self.hash_sha256.hexdigest()
+            if hash == None:
+                self.hash_sha256.update(successthing.encode())
+                hash = self.hash_sha256.hexdigest()
             try:
                 self.cur.execute('insert into {}_success values (?,?)'.format(self.name), (successthing, hash))
                 self.conn.commit()

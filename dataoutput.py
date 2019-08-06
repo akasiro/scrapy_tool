@@ -1,9 +1,12 @@
 import os,sqlite3,hashlib
 class dataoutput():
-    def __init__(self, method, data_path = 'data', db_name = 'data.db'):
-        if not os.path.exists(data_path):
-            os.makedirs(data_path)
-        if method.lower() == 'db':
+    def __init__(self, method = None, data_path = 'data', db_name = 'data.db'):
+
+        if method == None:
+            pass
+        elif method.lower() == 'db':
+            if not os.path.exists(data_path):
+                os.makedirs(data_path)
             self.conn = sqlite3.connect(os.path.join(data_path,db_name))
             self.cur = self.conn.cursor()
     def create_db_table(self,tablename,vardict):
@@ -42,16 +45,16 @@ class dataoutput():
                 print('ERROR: insert data')
 
 
-    def save_file(self,response, filepath, filename):
+    def save_file(self,data, filepath, filename):
         filehash = None
         full_filepath = os.path.join(filepath,filename)
         if not os.path.exists(full_filepath):
             if not os.path.exists(filepath):
                 os.makedirs(filepath)
             with open(full_filepath,'ab+') as f:
-                f.write(response.content)
+                f.write(data)
                 sha256_hash = hashlib.sha256()
-                sha256_hash.updata(f)
+                sha256_hash.update(data)
                 filehash = sha256_hash.hexdigest()
         return filehash
 

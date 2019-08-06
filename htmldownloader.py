@@ -1,7 +1,7 @@
 from requests.api import request
 from proxypool import *
 from headerpool import *
-
+from config import *
 class htmldownloader():
     def __init__(self,baseurl, **proxypoolkwargs):
         '''
@@ -21,7 +21,8 @@ class htmldownloader():
                     data=None, headers=None, cookies=None, files=None,
                     auth=None, timeout=None, allow_redirects=True, proxies=None,
                     hooks=None, stream=None, verify=None, cert=None, json=None,
-                    max_iter_time = 3, proxiesornot = True, proxies_code  = 0, sleeptime_for_error = 5):
+                    max_iter_time = DEFAULT_MAX_ITER_TIME, proxiesornot = True, proxies_code  = 0,
+                    sleeptime_for_error = DEFAULT_HTML_SLEEP_TIME):
         iter_time = 0
         response = None
         sleeptime = sleeptime_for_error
