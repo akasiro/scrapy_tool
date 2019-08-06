@@ -24,10 +24,11 @@ class album_spider():
             picname_pattern = re.compile('[\d]+.jpg')
             for picurl in picurllist:
                 picfilename = re.findall(picname_pattern,picurl)[0]
-                picres = self.downloader.downloadurl(picurl)
+                picres = self.downloader.downloadurl(picurl,max_iter_time=10, timeout=2)
                 if picres != None:
                     pichash = self.dp.save_file(data=picres.content,filename=picfilename,documentname=albumname)
                     self.dm.add_success(picfilename,hash = pichash)
+                    print('{:2f} | SUCCESS in download {}'.format((picurllist.index(picurl)+1)/len(picurllist)*100, picfilename))
                     time.sleep(2)
                 else:
                     print('ERROR: fail to download {}'.format(picfilename))
