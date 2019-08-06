@@ -2,7 +2,9 @@ import sqlite3,os,hashlib
 
 
 class dup_manager():
-    def __init__(self,name, type = 'varchar(50)',newlist = [], errortable = False, newtable = False, document_path = ''):
+    def __init__(self,name, type = 'varchar(50)',success_vardict = None,newlist = [], errortable = False, newtable = False, document_path = '.'):
+        if not os.path.exists(document_path):
+            os.makedirs(document_path)
         self.conn = sqlite3.connect(os.path.join(document_path,'duplicate_check.db'))
         self.cur = self.conn.cursor()
         self.name = name
@@ -10,8 +12,12 @@ class dup_manager():
         # 创建3个表
         # 1.创建已经完成的表
         self.success = set()
+        if success_vardict == None:
+            create_success_cmd = 'create table {}_success ({} {}, hash varchar(100) primary key)'.format(name,name,type)
+        else:
+            create_success_cmd = 'create table {}_success ({} {}, hash varchar(100) primary key, {})'.format(name,name,type,','.join(['{} {}'.format(k,v) for k,v in success_vardict.items()]))
         try:
-            self.cur.execute('create table {}_success ({} {}, hash varchar(100) primary key)'.format(name,name,type))
+            self.cur.execute(create_success_cmd)
             self.conn.commit()
         except:
             self.cur.execute('select {} from {}_success'.format(name,name))
@@ -69,15 +75,16 @@ class dup_manager():
     def get_new(self):
         return self.new.pop()
 
-    def add_new(self, newthing):
+    def add_new(self, newthing_dict):
         if self.error in dir():
             temp = self.error | self.success | self.new
         else:
             temp = self.success | self.new
-        if newthing not in temp:
-            self.new.add(newthing)
+        if newthing_dict.get(self.name) not in temp:
+            self.new.add(newthing_dict.get(self.name))
+            insert_cmd = 'insert into {}_new ({}) values ({}?)'.format(self.name,','.join(list(newthing_dict.keys())), '?,'*(len(newthing_dict)-1))
             try:
-                self.cur.execute('insert into {}_new values (?,?)'.format(self.name), (None,newthing))
+                self.cur.execute(insert_cmd, tuple(newthing_dict.values()))
                 self.conn.commit()
             except:
                 pass
