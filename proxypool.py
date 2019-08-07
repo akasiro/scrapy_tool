@@ -6,7 +6,8 @@ class proxypool():
                  qiyeurl = QIYE_URL,
                  xiciurl = XICI_URL,
                  china = True,
-                 testurl = TEST_URL):
+                 testurl = TEST_URL,
+                 timeout = 2):
         '''
 
         :param qiyeurl: the url  to get qiye proxies
@@ -19,7 +20,7 @@ class proxypool():
         self.xiciurl = xiciurl
         self.china = china
         self.testurl = testurl
-
+        self.timeout = timeout
         self.pool = self.refreshpool()
 
 
@@ -84,7 +85,7 @@ class proxypool():
             if testurl == None:
                 testurl = self.testurl
             try:
-                res = requests.get(testurl, headers=DEFAULT_HEADER, proxies=tempproxies)
+                res = requests.get(testurl, headers=DEFAULT_HEADER, proxies=tempproxies, timeout = self.timeout)
                 if res.status_code == 200:
                     res.close()
                     break
