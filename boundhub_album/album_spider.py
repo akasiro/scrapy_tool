@@ -41,7 +41,10 @@ class album_spider():
 
 if __name__ == "__main__":
     sp =album_spider()
-    albumurl = 'https://www.boundhub.com/albums/7780/court-bondage/'
-    albumlist = [albumurl,'https://www.boundhub.com/albums/7781/mysterious-town/','https://www.boundhub.com/albums/7782/all-kinds-of-straitjackets/']
+    # albumurl = 'https://www.boundhub.com/albums/7780/court-bondage/'
+    with open('urllist.txt','r') as f:
+        tmp = f.readlines()
+    albumlist = [i.replace('\n','') for i in tmp]
     for i in albumlist:
         sp.from_album_url(i)
+    print('mission complete')
